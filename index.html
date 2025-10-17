@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Markdown Demo - GitHub Pages</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.0/styles/default.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.0/highlight.min.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <h1>Markdown to HTML Demo</h1>
+    <p>Input is loaded from input.md attachment and rendered with marked. Code blocks are highlighted with highlight.js.</p>
+  </header>
+  <main class="container">
+    <section id="markdown-section">
+      <div id="markdown-output" class="markdown-output"></div>
+    </section>
+  </main>
+
+  <!-- Simulated attachment input.md via data URL (falls back to default if empty) -->
+  <div id="attachment-holder" data-url="data:text/markdown;base64,"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      let mdContent = '';
+      const holder = document.getElementById('attachment-holder');
+      if (holder && holder.dataset.url) {
+        const url = holder.dataset.url;
+        const comma = url.indexOf(',');
+        if (comma > -1) {
+          const b64 = url.substring(comma + 1);
+          if (b64 && b64.length > 0) {
+            try {
+              const decoded = decodeURIComponent(escape(atob(b64)));
+              if (decoded && decoded.trim().length > 0) {
+                mdContent = decoded;
+              }
+            } catch (e) {
+              // ignore; will fall back
+            }
+          }
+        }
+      }
+      if (!mdContent) {
+        mdContent = '# Demo Heading\n\nThis is a fallback Markdown used when the attachment cannot be loaded.\n\n```js\nconsole.log("Hello from Markdown");\n```\n';
+      }
+
+      const html = marked(mdContent);
+      const out = document.getElementById('markdown-output');
+      out.innerHTML = html;
+
+      // Highlight code blocks
+      document.querySelectorAll('pre code').forEach((block) => {
+        if (typeof hljs !== 'undefined') hljs.highlightBlock(block);
+      });
+    });
+  </script>
+</body>
+</html>
